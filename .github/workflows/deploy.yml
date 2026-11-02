@@ -1,7 +1,7 @@
 name: Snowflake Production Deployment
 
 on:
-  workflow_dispatch: 
+  workflow_dispatch:
 
 jobs:
   deploy:
@@ -43,16 +43,21 @@ jobs:
           snowsql -c prod -q "SELECT CURRENT_ACCOUNT(), CURRENT_USER(), CURRENT_ROLE();"
 
       - name: Execute 01ENV
-        run: snowsql -c prod -f sql/01ENV.sql
+        run: |
+          snowsql -c prod -f sql/01ENV.sql
 
       - name: Execute 02a
-        run: snowsql -c prod -f sql/02a.sql
+        run: |
+          snowsql -c prod -f sql/02a.sql
 
       - name: Execute 02b
-        run: snowsql -c prod -f sql/02b.sql
+        run: |
+          snowsql -c prod -f sql/02b.sql
 
       - name: Execute Validation Checks
-        run: snowsql -c prod -f sql/03checks.sql
+        run: |
+          snowsql -c prod -f sql/03checks.sql
 
       - name: Execute Deploy App
-        run: snowsql -c prod -f "sql/04deployapp.sql" 
+        run: |
+          snowsql -c prod -f "sql/04deployapp.sql"
