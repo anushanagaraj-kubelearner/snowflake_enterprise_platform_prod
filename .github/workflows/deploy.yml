@@ -42,7 +42,7 @@ jobs:
 
       - name: Execute Deploy App
         run: |
-          snowsql -f "sql/4 deployapp.sql"
+          snowsql -f "sql/04deployapp.sql"
 
       - name: Execute Validation Checks
         run: |
