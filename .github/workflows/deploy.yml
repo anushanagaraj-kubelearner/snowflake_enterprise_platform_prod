@@ -24,9 +24,9 @@ jobs:
         run: |
           pip install snowflake-cli-labs
 
-      - name: Verify Connection
+      - name: Test Snowflake Connection
         run: |
-          snow connection test
+          snowsql -c prod -q "SELECT CURRENT_ACCOUNT(), CURRENT_USER(), CURRENT_ROLE();"
 
       - name: Execute 01ENV
         run: |
