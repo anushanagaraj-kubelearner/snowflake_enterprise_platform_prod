@@ -1,4 +1,4 @@
-name: Snowflake Deployment
+name: Snowflake Production Deployment
 
 on:
   workflow_dispatch:
@@ -7,46 +7,43 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
 
+    env:
+      SNOWSQL_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
+      SNOWSQL_USER: ${{ secrets.SNOWFLAKE_USER }}
+      SNOWSQL_PWD: ${{ secrets.SNOWFLAKE_PASSWORD }}
+      SNOWSQL_ROLE: ${{ secrets.SNOWFLAKE_ROLE }}
+      SNOWSQL_WAREHOUSE: ${{ secrets.SNOWFLAKE_WAREHOUSE }}
+      SNOWSQL_DATABASE: ${{ secrets.SNOWFLAKE_DATABASE }}
+      SNOWSQL_SCHEMA: ${{ secrets.SNOWFLAKE_SCHEMA }}
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
       - name: Install SnowSQL
         run: |
-          curl -O https://sfc-repo.snowflakecomputing.com/snowsql/bootstrap/1.3/linux_x86_64/snowsql-linux_x86_64.bash
-          bash snowsql-linux_x86_64.bash
+          pip install snowflake-cli-labs
+
+      - name: Verify Connection
+        run: |
+          snow connection test
 
       - name: Execute 01ENV
-        run: snowsql -f sql/01ENV.sql
-        env:
-          SNOWSQL_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
-          SNOWSQL_USER: ${{ secrets.SNOWFLAKE_USER }}
-          SNOWSQL_PWD: ${{ secrets.SNOWFLAKE_PASSWORD }}
+        run: |
+          snowsql -f sql/01ENV.sql
 
       - name: Execute 02a
-        run: snowsql -f sql/02a.sql
-        env:
-          SNOWSQL_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
-          SNOWSQL_USER: ${{ secrets.SNOWFLAKE_USER }}
-          SNOWSQL_PWD: ${{ secrets.SNOWFLAKE_PASSWORD }}
+        run: |
+          snowsql -f sql/02a.sql
 
       - name: Execute 02b
-        run: snowsql -f sql/02b.sql
-        env:
-          SNOWSQL_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
-          SNOWSQL_USER: ${{ secrets.SNOWFLAKE_USER }}
-          SNOWSQL_PWD: ${{ secrets.SNOWFLAKE_PASSWORD }}
+        run: |
+          snowsql -f sql/02b.sql
 
-      - name: Deploy Application
-        run: snowsql -f "sql/4 deployapp.sql"
-        env:
-          SNOWSQL_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
-          SNOWSQL_USER: ${{ secrets.SNOWFLAKE_USER }}
-          SNOWSQL_PWD: ${{ secrets.SNOWFLAKE_PASSWORD }}
+      - name: Execute Deploy App
+        run: |
+          snowsql -f "sql/4 deployapp.sql"
 
-      - name: Run Checks
-        run: snowsql -f sql/03checks.sql
-        env:
-          SNOWSQL_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
-          SNOWSQL_USER: ${{ secrets.SNOWFLAKE_USER }}
-          SNOWSQL_PWD: ${{ secrets.SNOWFLAKE_PASSWORD }}
+      - name: Execute Validation Checks
+        run: |
+          snowsql -f sql/03checks.sql
