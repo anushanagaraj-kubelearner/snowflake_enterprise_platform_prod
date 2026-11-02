@@ -1,0 +1,7 @@
+# Blinding control app: Immunocore white and blue. Read by Streamlit in Snowflake from .streamlit/ on the app's stage.
+[theme]
+base = "light"
+primaryColor = "#0055A4"
+backgroundColor = "#FFFFFF"
+secondaryBackgroundColor = "#EEF3FA"
+textColor = "#0F2440"
