@@ -55,4 +55,4 @@ jobs:
         run: snowsql -c prod -f sql/03checks.sql
 
       - name: Execute Deploy App
-        run: snowsql -c prod -f "sql/04deployapp.sql"
+        run: snowsql -c prod -f "sql/04deployapp.sql" 
