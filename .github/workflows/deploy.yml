@@ -21,14 +21,19 @@ jobs:
 
       - name: Install SnowSQL
         run: |
-          curl -O https://sfc-repo.snowflakecomputing.com/snowsql/bootstrap/1.3/linux_x86_64/snowsql-linux_x86_64.bash
+          wget https://sfc-repo.snowflakecomputing.com/snowsql/bootstrap/1.2/linux_x86_64/snowsql-linux_x86_64.bash
           bash snowsql-linux_x86_64.bash -y
+          echo "$HOME/bin" >> $GITHUB_PATH
+
+      - name: Verify SnowSQL Installation
+        run: |
+          snowsql --version
 
       - name: Configure SnowSQL
         run: |
           mkdir -p ~/.snowsql
 
-          cat > ~/.snowsql/config <<EOF
+          cat > ~/.snowsql/config << EOF
           [connections.prod]
           accountname=${SNOWFLAKE_ACCOUNT}
           username=${SNOWFLAKE_USER}
@@ -60,4 +65,4 @@ jobs:
 
       - name: Execute Deploy App
         run: |
-          snowsql -c prod -f "sql/04deployapp.sql"
+          snowsql -c prod -f sql/04deployapp.sql
