@@ -19,50 +19,47 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Install SnowSQL
+      - name: Install Snowflake CLI
         run: |
-          wget https://sfc-repo.snowflakecomputing.com/snowsql/bootstrap/1.2/linux_x86_64/snowsql-linux_x86_64.bash
-          bash snowsql-linux_x86_64.bash -y
-          echo "$HOME/bin" >> $GITHUB_PATH
+          python -m pip install --upgrade pip
+          pip install snowflake-cli-labs
 
-      - name: Verify SnowSQL Installation
+      - name: Configure Snowflake Connection
         run: |
-          snowsql --version
+          mkdir -p ~/.snowflake
 
-      - name: Configure SnowSQL
-        run: |
-          mkdir -p ~/.snowsql
+          cat > ~/.snowflake/config.toml << EOF
+          default_connection_name = "prod"
 
-          cat > ~/.snowsql/config << EOF
           [connections.prod]
-          accountname=${SNOWFLAKE_ACCOUNT}
-          username=${SNOWFLAKE_USER}
-          password=${SNOWFLAKE_PASSWORD}
-          rolename=${SNOWFLAKE_ROLE}
-          warehousename=${SNOWFLAKE_WAREHOUSE}
-          databasename=${SNOWFLAKE_DATABASE}
+          account = "${SNOWFLAKE_ACCOUNT}"
+          user = "${SNOWFLAKE_USER}"
+          password = "${SNOWFLAKE_PASSWORD}"
+          role = "${SNOWFLAKE_ROLE}"
+          warehouse = "${SNOWFLAKE_WAREHOUSE}"
+          database = "${SNOWFLAKE_DATABASE}"
           EOF
 
-      - name: Test Connection
+      - name: Verify Connection
         run: |
-          snowsql -c prod -q "SELECT CURRENT_ACCOUNT(), CURRENT_USER(), CURRENT_ROLE();"
+          snow connection test
 
       - name: Execute 01ENV
         run: |
-          snowsql -c prod -f sql/01ENV.sql
+          snow sql -f sql/01ENV.sql
 
       - name: Execute 02a
         run: |
-          snowsql -c prod -f sql/02a.sql
+          snow sql -f sql/02a.sql
 
       - name: Execute 02b
         run: |
-          snowsql -c prod -f sql/02b.sql
+          snow sql -f sql/02b.sql
 
       - name: Execute Validation Checks
         run: |
-          snowsql -c prod -f sql/03checks.sql
+          snow sql -f sql/03checks.sql
 
       - name: Execute Deploy App
         run: |
-          snowsql -c prod -f sql/04deployapp.sql
+          snow sql -f sql/04deployapp.sql
