@@ -40,6 +40,10 @@ jobs:
           database = "${SNOWFLAKE_DATABASE}"
           EOF
 
+      - name: Fix Permissions
+        run: |
+          chmod 600 ~/.snowflake/config.toml
+
       - name: Verify Connection
         run: |
           snow connection test
